@@ -33,7 +33,7 @@ class kMeansCluster:
         distances = np.ones((data.shape[0], self.k))
 
         for c in range(self.k):
-            distances[:,c]*=((data-self.centroids[c])**2).sum(axis=1)
+            distances[:,c]*=((data-self.centroids[c])**2).mean(axis=1)
 
         labels = distances.argmin(axis=1)
 
