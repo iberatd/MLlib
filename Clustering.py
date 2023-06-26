@@ -2,9 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt 
 
 class kMeansCluster:
-    def __init__(self):
+    def __init__(self, max_iter=100):
         self.centroids = 0
         self.k=0
+        self.max_iter = max_iter
 
 
     def fit(self, data, k=3):
@@ -22,16 +23,22 @@ class kMeansCluster:
 
         fig, ax = plt.subplots(1, 5, figsize=(25,5))
 
-        for i in range(5):
+        for i in range(self.max_iter):
             preds = self.predict(data)
 
-            ax[i].scatter(x=data[:,0], y= data[:,1], c= preds)
-            ax[i].scatter(self.centroids[:,0], self.centroids[:,1], c="r")
+            # ax[i].scatter(x=data[:,0], y= data[:,1], c= preds)
+            # ax[i].scatter(self.centroids[:,0], self.centroids[:,1], c="r")
+
+            old_cent = self.centroids.copy()
             
 
             self.update_centroids(data, preds)
 
-            ax[i].scatter(self.centroids[:,0], self.centroids[:,1], c="b")
+            if(np.all(old_cent==self.centroids)):
+                return self.centroids
+            
+
+            # ax[i].scatter(self.centroids[:,0], self.centroids[:,1], c="b")
 
 
         return self.centroids
