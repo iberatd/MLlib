@@ -2,32 +2,19 @@ import numpy as np
 import matplotlib.pyplot as plt 
 
 class kMeansCluster:
-    def __init__(self, max_iter=100):
+    def __init__(self, k =3, max_iter=100, random_centroids = False):
         self.centroids = 0
-        self.k=0
+        self.k=k
         self.max_iter = max_iter
+        self.random_centroids = random_centroids
 
 
     def fit(self, data, k=3):
-        
-        self.k=k
 
-        f = data.shape[1] ##feature number
-
-        self.centroids = np.random.uniform(0, 1, (k, f))
-
-        mins = data.min(axis=0)
-        maxs = data.max(axis=0)
-
-        self.centroids = self.centroids* (maxs-mins) + mins
-
-        fig, ax = plt.subplots(1, 5, figsize=(25,5))
+        self.initialize_centroids(data)
 
         for i in range(self.max_iter):
             preds = self.predict(data)
-
-            # ax[i].scatter(x=data[:,0], y= data[:,1], c= preds)
-            # ax[i].scatter(self.centroids[:,0], self.centroids[:,1], c="r")
 
             old_cent = self.centroids.copy()
             
@@ -37,9 +24,6 @@ class kMeansCluster:
             if(np.all(old_cent==self.centroids)):
                 return self.centroids
             
-
-            # ax[i].scatter(self.centroids[:,0], self.centroids[:,1], c="b")
-
 
         return self.centroids
     
@@ -68,3 +52,22 @@ class kMeansCluster:
 
         for c in range(self.k):
             self.centroids[c] = np.nan_to_num(data.T@one_hot_encoded[:,c], nan=0) / one_hot_encoded[:,c].sum()
+
+    def initialize_centroids(self, data):
+
+
+        if (self.random_centroids):    
+            f = data.shape[1] ##feature number
+
+            self.centroids = np.random.uniform(0, 1, (self.k, f))
+
+            mins = data.min(axis=0)
+            maxs = data.max(axis=0)
+
+            self.centroids = self.centroids* (maxs-mins) + mins
+        else:
+            num_rows = data.shape[0]
+
+            random_indices = np.random.choice(num_rows, size=self.k, replace=False)
+
+            self.centroids = data[random_indices, :]
