@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt 
+from scipy.spatial.distance import cdist
 
 class kMeansCluster:
     def __init__(self, k =3, max_iter=100, random_centroids = False):
@@ -71,3 +72,43 @@ class kMeansCluster:
             random_indices = np.random.choice(num_rows, size=self.k, replace=False)
 
             self.centroids = data[random_indices, :]
+
+
+
+class HierarchicalCluster:
+    """agglomeraive clustering for now"""
+
+    def __init__(self):
+        self.elements=[]
+
+    def fit(self, data):
+        X=data.copy()
+        self.elements = list(range(len(X)))
+        
+        while(len(self.elements!=1)):
+            ### Creating distance matrix
+            distance_matrix = cdist(data, data, metric='euclidean')
+            identity_matrix = np.eye(data.shape[0])
+            distance_matrix += identity_matrix*distance_matrix.max()
+            
+            ## finding closest two elements
+            min_indices = np.where(distance_matrix == np.min(distance_matrix))
+            el1 = min(min_indices[0])
+            el2 = max(min_indices[0])
+
+            # center of new cluster
+            new = (X[el1] +  X[el2])/2 ### this can be weighted maybe ? TODO
+            X = np.vstack([X, new])  ## add new element to data matrix
+            X = np.delete(X, [el1, el2], axis=0) ##remove old data matrix
+
+            ## elements list
+            new_cluster = [self.elements[el1], self.elements[el2]] 
+            self.elements.pop(el2)
+            self.elements.pop(el1)
+            self.elements.append(new_cluster)
+
+        return distance_matrix
+    
+
+    
+
