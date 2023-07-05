@@ -81,14 +81,15 @@ class HierarchicalCluster:
     def __init__(self):
         self.elements=[]
 
-    def fit(self, data):
+    def fit(self, data, k):
         X=data.copy()
         self.elements = list(range(len(X)))
         
-        while(len(self.elements!=1)):
+        while(len(self.elements) >k):
+
             ### Creating distance matrix
-            distance_matrix = cdist(data, data, metric='euclidean')
-            identity_matrix = np.eye(data.shape[0])
+            distance_matrix = cdist(X, X, metric='euclidean')
+            identity_matrix = np.eye(X.shape[0])
             distance_matrix += identity_matrix*distance_matrix.max()
             
             ## finding closest two elements
@@ -107,8 +108,23 @@ class HierarchicalCluster:
             self.elements.pop(el1)
             self.elements.append(new_cluster)
 
-        return distance_matrix
+
+        flat = [self.flatten_list(l) for l in self.elements]
+
+        result = np.ones((0,2), dtype=int)
+        for i, c in enumerate(flat):
+            labels = [i for _ in c]
+
+            result = np.vstack( [result, list(zip(c, labels))])
+
+        return result
     
 
-    
-
+    def flatten_list(self, nested_list):
+        flattened = []
+        for item in nested_list:
+            if isinstance(item, list):
+                flattened.extend(self.flatten_list(item))
+            else:
+                flattened.append(item)
+        return flattened
